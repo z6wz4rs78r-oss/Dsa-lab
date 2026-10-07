@@ -1,0 +1,179 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class LibraryItem {
+public:
+    virtual void display() const = 0;
+    virtual ~LibraryItem() {}
+};
+
+class Book : public LibraryItem {
+private:
+    string title;
+    string author;
+    int pages;
+
+public:
+    Book() : title(""), author(""), pages(0) {}
+    Book(string t, string a, int p) : title(t), author(a), pages(p) {}
+
+    string getTitle() const { return title; }
+    string getAuthor() const { return author; }
+    int getPages() const { return pages; }
+
+    void display() const override {
+        cout << "[Book] Title: \"" << title << "\", Author: " << author << ", Pages: " << pages << endl;
+    }
+};
+
+class Newspaper : public LibraryItem {
+private:
+    string name;
+    string date;
+    string edition;
+
+public:
+    Newspaper() : name(""), date(""), edition("") {}
+    Newspaper(string n, string d, string e) : name(n), date(d), edition(e) {}
+
+    string getName() const { return name; }
+    string getDate() const { return date; }
+    string getEdition() const { return edition; }
+
+    void display() const override {
+        cout << "[Newspaper] Name: " << name << ", Date: " << date << ", Edition: " << edition << endl;
+    }
+};
+
+template <typename T, typename Key>
+int linearSearch(T collection[], int size, Key key, string searchType) {
+    for (int i = 0; i < size; ++i) {
+        if (searchType == "title" && collection[i].getTitle() == key) {
+            return i;
+        }
+        if (searchType == "name" && collection[i].getName() == key) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+class Library {
+private:
+    Book books[10];
+    int bookCount;
+    Newspaper newspapers[10];
+    int newspaperCount;
+
+public:
+    Library() : bookCount(0), newspaperCount(0) {}
+
+    void addBook(const Book& book) {
+        if (bookCount < 10) {
+            books[bookCount++] = book;
+        }
+    }
+
+    void addNewspaper(const Newspaper& newspaper) {
+        if (newspaperCount < 10) {
+            newspapers[newspaperCount++] = newspaper;
+        }
+    }
+
+    void displayCollection() const {
+        cout << "--- Books Collection ---" << endl;
+        for (int i = 0; i < bookCount; ++i) {
+            books[i].display();
+        }
+        cout << endl << "--- Newspapers Collection ---" << endl;
+        for (int i = 0; i < newspaperCount; ++i) {
+            newspapers[i].display();
+        }
+    }
+
+    void sortBooksByPages() {
+        for (int i = 0; i < bookCount - 1; ++i) {
+            for (int j = 0; j < bookCount - i - 1; ++j) {
+                if (books[j].getPages() > books[j + 1].getPages()) {
+                    Book temp = books[j];
+                    books[j] = books[j + 1];
+                    books[j + 1] = temp;
+                }
+            }
+        }
+    }
+
+    void sortNewspapersByEdition() {
+        for (int i = 0; i < newspaperCount - 1; ++i) {
+            for (int j = 0; j < newspaperCount - i - 1; ++j) {
+                if (newspapers[j].getEdition() > newspapers[j + 1].getEdition()) {
+                    Newspaper temp = newspapers[j];
+                    newspapers[j] = newspapers[j + 1];
+                    newspapers[j + 1] = temp;
+                }
+            }
+        }
+    }
+
+    Book* searchBookByTitle(const string& title) {
+        int index = linearSearch(books, bookCount, title, "title");
+        if (index != -1) {
+            return &books[index];
+        }
+        return nullptr;
+    }
+
+    Newspaper* searchNewspaperByName(const string& name) {
+        int index = linearSearch(newspapers, newspaperCount, name, "name");
+        if (index != -1) {
+            return &newspapers[index];
+        }
+        return nullptr;
+    }
+};
+
+int main() {
+    Book book1("The Catcher in the Rye", "J.D. Salinger", 277);
+    Book book2("To Kill a Mockingbird", "Harper Lee", 324);
+
+    Newspaper newspaper1("Washington Post", "2024-10-13", "Morning Edition");
+    Newspaper newspaper2("The Times", "2024-10-12", "Weekend Edition");
+
+    Library library;
+
+    library.addBook(book1);
+    library.addBook(book2);
+    library.addNewspaper(newspaper1);
+    library.addNewspaper(newspaper2);
+
+    cout << "Before Sorting:" << endl;
+    library.displayCollection();
+
+    library.sortBooksByPages();
+    library.sortNewspapersByEdition();
+
+    cout << endl << "After Sorting:" << endl;
+    library.displayCollection();
+
+    Book* foundBook = library.searchBookByTitle("The Catcher in the Rye");
+    if (foundBook) {
+        cout << endl << "Found Book:" << endl;
+        foundBook->display();
+    }
+    else {
+        cout << endl << "Book not found." << endl;
+    }
+
+    Newspaper* foundNewspaper = library.searchNewspaperByName("The Times");
+    if (foundNewspaper) {
+        cout << endl << "Found Newspaper:" << endl;
+        foundNewspaper->display();
+    }
+    else {
+        cout << endl << "Newspaper not found." << endl;
+    }
+
+    return 0;
+}
