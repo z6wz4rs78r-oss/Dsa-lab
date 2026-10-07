@@ -1,1 +1,39 @@
+#include<iostream>
+using namespace std;
 
+class shape
+{
+public:
+	virtual double area() = 0;
+};
+class circle :public shape {
+private:
+	double radius;
+public:
+	circle(double r) {
+		radius = r;
+	}
+	double area() {
+		return 3.14159 * radius * radius;
+	}
+};
+class rectangle :public shape {
+private:
+	double length;
+	double width;
+public:
+	rectangle(double i, double w) {
+		length = i;
+		width = w;
+	}
+	double area() {
+		return length * width;
+	}
+};
+int main() {
+	circle c(5);
+	rectangle r(10, 4);
+	cout << "area of circle =" << c.area() << endl;
+	cout << "area of rectangle =" << r.area() << endl;
+	return 0;
+}
